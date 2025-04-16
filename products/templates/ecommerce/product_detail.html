@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>{{ product.name }}</title>
+    
+{% endblock %}
+
+{% block special_css %}
+    <link rel="stylesheet" href="{% static 'product_details.css' %}">
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <a href="/">Каталог</a> /
+        <span>{{ product.name }}</span>
+    </nav>
+
+    <div class="product-container">
+        {% if product.discount %}
+            <div class="discount-badge">-{{ product.discount }}%</div>
+        {% endif %}
+
+        <h1>{{ product.name }}</h1>
+
+        <p class="product-description">
+            Акция действует при наличии товара на полке. Подробности уточняйте у сотрудников магазина.
+        </p>
+
+
+        <div class="price">
+            <span class="new-price">{{ product.price }} ₸</span>
+        </div>
+
+
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+        {% endif %}
+
+        <p class="category-label">Категория: {{ product.category }}</p>
+          {% if user.is_authenticated %}
+              <a class="btn btn-primary" href="{% url 'review_create' product.pk %}">Add Review</a>
+
+          {% endif %}
+        <br>
+        {% for review in reviews %}
+            <br>
+            <span class="text-info">Author:</span> <span>{{ review.user_name }}</span>
+            <br>
+            <span class="text-info">Comment: </span> <span>{{ review.text }}</span>
+            <br>
+            {%  if user.id == review.user_id or user.is_staff %}
+                <a href="{% url 'review_edit' product.pk review.pk %}">Edit Review</a>
+            {% endif %}
+            <hr>
+        {% endfor %}
+    </div>
+{% endblock %}
