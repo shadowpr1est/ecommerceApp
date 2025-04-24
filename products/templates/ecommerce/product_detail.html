@@ -22,12 +22,8 @@
 
         <h1>{{ product.name }}</h1>
 
-        <p class="product-description">
-            Акция действует при наличии товара на полке. Подробности уточняйте у сотрудников магазина.
-        </p>
-
         <div class="price">
-            <span class="new-price">{{ product.price }} ₸</span>
+            <span class="new-price">{{ product.total_price }} ₸</span>
         </div>
 
         {% if product.image %}
@@ -54,6 +50,9 @@
     </div>
 
     <script>
+    const currentUserId = {{ user.id|default:"null" }};
+    const isStaff = {{ user.is_staff|yesno:"true,false" }};
+
     document.addEventListener("DOMContentLoaded", function () {
         fetch("/api/products/{{ product.id }}/reviews/")
             .then(res => res.json())
@@ -67,15 +66,17 @@
 
                 data.forEach(review => {
                     const div = document.createElement("div");
+
+                    let editLink = "";
+                    if (currentUserId === review.user_id || isStaff === "true") {
+                        editLink = `<a href="/product/{{ product.id }}/reviews/${review.id}/">Изменить отзыв</a>`;
+                    }
+
                     div.innerHTML = `
                         <div class="review">
                             <strong class="text-info">Автор:</strong> ${review.user_name}<br>
                             <strong class="text-info">Комментарий:</strong> ${review.text}<br>
-                            {% if user.is_authenticated %}
-                                ${(review.user_id === {{ user.id|default:'null' }}) || {{ user.is_staff|yesno:"true,false" }} ?
-                                    `<a href="/product/{{ product.id }}/reviews/${review.id}/">Изменить отзыв</a>` : ''
-                                }
-                            {% endif %}
+                            ${editLink}
                             <hr>
                         </div>
                     `;
@@ -87,5 +88,6 @@
                 console.error(err);
             });
     });
-    </script>
+</script>
+
 {% endblock %}

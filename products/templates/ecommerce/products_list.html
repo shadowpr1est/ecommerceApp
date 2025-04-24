@@ -32,8 +32,8 @@
                 {% endif %}
                 <p>{{ product.name }}</p>
 
-                <p class="old-price">{{ product.old_price }}1320 тг</p>
-                <p class="new-price">{{ product.price|floatformat:0 }} тг</p>
+                <p class="old-price">{{ product.price }} тг</p>
+                <p class="new-price">{{ product.total_price|floatformat:0 }} тг</p>
             </a>
         </div>
     {% endfor %}

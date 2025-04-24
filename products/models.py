@@ -2,49 +2,57 @@ from django.contrib import admin
 from django.utils.timezone import now
 from django.db import models
 
+from django.db import models
+from django.utils.timezone import now
+from decimal import Decimal
+# models.py
+
+from django.db import models
+from django.utils.timezone import now
+from decimal import Decimal
+
 class Vacancy(models.Model):
-    full_name = models.CharField(max_length=150, verbose_name="Имя и Фамилия")
-    phone_number = models.CharField(max_length=20, verbose_name="Номер телефона")
-    about = models.TextField(verbose_name="О себе")
+    full_name = models.CharField("ФИО", max_length=150)
+    phone_number = models.CharField("Телефон", max_length=20)
+    about = models.TextField("О себе")
 
     def __str__(self):
         return self.full_name
 
 
 class Category(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    category = models.CharField(max_length=150)
+    name = models.CharField(max_length=255, db_index=True)
 
     def __str__(self):
-        return self.category
+        return self.name
 
 
 class Product(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=150)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    stock = models.IntegerField(default=0)
-    image = models.ImageField(upload_to="products/", blank=True, null=True, default="")
+    name = models.CharField("Название", max_length=150)
+    cat = models.ForeignKey('Category', on_delete=models.CASCADE, null=True,related_name="products")
+    price = models.DecimalField("Цена", max_digits=10, decimal_places=2)
+    discount = models.PositiveIntegerField("Скидка %", default=0)
+    image = models.ImageField("Изображение", upload_to="products/%Y/%m/%d/", blank=True, null=True)
+
     def __str__(self):
-        return f"{self.name}, {self.price}"
+        return f"{self.name} — {self.total_price} тг"
+
+    @property
+    def total_price(self):
+        return self.price - self.price * self.discount/100
 
 
 class Comment(models.Model):
-    product = models.ForeignKey(Product, related_name="comments", on_delete=models.CASCADE)
-    user_name = models.CharField(max_length=150)
-    user_id = models.IntegerField(null=True,blank=True)
-    text = models.TextField()
-    created_date = models.DateTimeField(default=now)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="comments")
+    user_name = models.CharField("Имя пользователя", max_length=150)
+    text = models.TextField("Комментарий")
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
 
     def __str__(self):
-        return f"Comment by {self.user_name} on {self.product.name}"
-
+        return f"{self.user_name} → {self.product.name}"
 
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'price')
-    list_filter = ('category',)
+    list_filter = ('cat',)
     search_fields = ('name',)
-
-
