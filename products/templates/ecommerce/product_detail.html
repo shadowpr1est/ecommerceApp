@@ -3,7 +3,6 @@
 
 {% block title %}
     <title>{{ product.name }}</title>
-    
 {% endblock %}
 
 {% block special_css %}
@@ -27,32 +26,66 @@
             Акция действует при наличии товара на полке. Подробности уточняйте у сотрудников магазина.
         </p>
 
-
         <div class="price">
             <span class="new-price">{{ product.price }} ₸</span>
         </div>
-
 
         {% if product.image %}
             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
         {% endif %}
 
         <p class="category-label">Категория: {{ product.category }}</p>
-          {% if user.is_authenticated %}
-              <a class="btn btn-primary" href="{% url 'review_create' product.pk %}">Add Review</a>
 
-          {% endif %}
-        <br>
-        {% for review in reviews %}
-            <br>
-            <span class="text-info">Author:</span> <span>{{ review.user_name }}</span>
-            <br>
-            <span class="text-info">Comment: </span> <span>{{ review.text }}</span>
-            <br>
-            {%  if user.id == review.user_id or user.is_staff %}
-                <a href="{% url 'review_edit' product.pk review.pk %}">Edit Review</a>
+        <div class="product-actions">
+            {% if user.is_authenticated %}
+                <a class="btn btn-primary" href="{% url 'review_create' product.pk %}">Добавить отзыв</a>
             {% endif %}
-            <hr>
-        {% endfor %}
+
+            {% if perms.products.change_product %}
+                <a href="{% url 'edit_product' product.pk %}" class="edit-btn">Редактировать</a>
+            {% endif %}
+        </div>
+
+        <hr>
+        <h2>Отзывы</h2>
+        <div id="reviews-list">
+            <p>Загрузка отзывов...</p>
+        </div>
     </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch("/api/products/{{ product.id }}/reviews/")
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById("reviews-list");
+                container.innerHTML = "";
+
+                if (data.length === 0) {
+                    container.innerHTML = "<p>Пока нет отзывов.</p>";
+                }
+
+                data.forEach(review => {
+                    const div = document.createElement("div");
+                    div.innerHTML = `
+                        <div class="review">
+                            <strong class="text-info">Автор:</strong> ${review.user_name}<br>
+                            <strong class="text-info">Комментарий:</strong> ${review.text}<br>
+                            {% if user.is_authenticated %}
+                                ${(review.user_id === {{ user.id|default:'null' }}) || {{ user.is_staff|yesno:"true,false" }} ?
+                                    `<a href="/product/{{ product.id }}/reviews/${review.id}/">Изменить отзыв</a>` : ''
+                                }
+                            {% endif %}
+                            <hr>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            })
+            .catch(err => {
+                document.getElementById("reviews-list").innerHTML = "<p>Ошибка загрузки отзывов</p>";
+                console.error(err);
+            });
+    });
+    </script>
 {% endblock %}

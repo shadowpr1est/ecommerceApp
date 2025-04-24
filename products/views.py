@@ -1,9 +1,9 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
 from django.utils.timezone import now
 
-from .forms import VacancyForm, CommentForm
+from .forms import VacancyForm, CommentForm, ProductForm, CategoryForm
 from .models import Comment
 from .models import Product, Category
 
@@ -93,3 +93,48 @@ def review_edit(request, pk, review_pk=None):
         form = CommentForm(instance=comment)
 
     return render(request, 'ecommerce/review_form.html', {'form': form, 'product': product})
+
+@permission_required('products.add_product', raise_exception=True)
+def add_product(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = ProductForm()
+    return render(request, 'add_product.html', {'form': form})
+
+
+@permission_required('products.edit_product', raise_exception=True)
+def edit_product(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'delete':
+            product.delete()
+            return redirect('home')
+
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = ProductForm(instance=product)
+
+    return render(request, 'edit_product.html', {'form': form})
+
+
+
+@permission_required('products.add_category', raise_exception=True)
+def add_category(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = CategoryForm()
+    return render(request, 'add_category.html', {'form': form})

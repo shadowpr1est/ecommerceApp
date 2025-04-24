@@ -27,7 +27,9 @@
         <div class="product-card">
             <div class="discount-badge">-{{ product.discount }}%</div>
             <a href="/product/{{ product.id }}/" class="product-name">
-                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% endif %}
                 <p>{{ product.name }}</p>
 
                 <p class="old-price">{{ product.old_price }}1320 тг</p>

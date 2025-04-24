@@ -42,9 +42,14 @@
     {% endfor %}
     </p>
 </div>
-
-
   </div>
+<a href="{% url 'add_product' %}">
+  <button>Добавить продукт</button>
+</a>
+
+<a href="{% url 'add_category' %}">
+  <button>Добавить категорию</button>
+</a>
 
 
 {% endblock %}

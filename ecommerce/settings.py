@@ -25,13 +25,16 @@ SECRET_KEY = 'django-insecure-7ca+o3pdyywns8f64-i@ly5*l*mqgp+1$=g4=doh7nbxlb(v^r
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 AWS_S3_USE_SSL = False
 AWS_S3_SECURE_URLS = False
 AWS_S3_URL_PROTOCOL = "http:"
 AWS_S3_ENDPOINT_URL= "http://minio:9000"
 AWS_S3_CUSTOM_DOMAIN = "localhost:9000/my-bucket"
-
+AWS_ACCESS_KEY_ID = "minioadmin"
+AWS_SECRET_ACCESS_KEY = "minioadmin"
+AWS_STORAGE_BUCKET_NAME = "my-bucket"
+AWS_S3_FILE_OVERWRITE = True
+AWS_S3_ADDRESSING_STYLE = "path"
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'products',
-    'storages'
+    'storages',
+    'rest_framework'
 ]
 
 STORAGES = {

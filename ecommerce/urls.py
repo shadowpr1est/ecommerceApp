@@ -18,14 +18,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from ecommerce.views import profile
+
 
 
 urlpatterns = [
-    path("accounts/", include(("django.contrib.auth.urls", "auth"), namespace="accounts")),
-    path('accounts/profile/', profile, name='profile'),
     path('admin/', admin.site.urls),
-    path('', include("products.urls"))
+    path('', include("products.urls")),
+    path('api/', include('products.api_urls')),
 ]
 
 if settings.DEBUG:

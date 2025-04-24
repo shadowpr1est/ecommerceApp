@@ -12,6 +12,7 @@ class Vacancy(models.Model):
 
 
 class Category(models.Model):
+    id = models.BigAutoField(primary_key=True)
     category = models.CharField(max_length=150)
 
     def __str__(self):

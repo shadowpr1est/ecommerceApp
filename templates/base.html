@@ -29,7 +29,7 @@
             <a href="#">О нас</a>
             <a href="{% url 'leave_request' %}">Вакансии</a>
             {% if user.is_authenticated %}
-                <a href="accounts/profile">Профиль</a>
+                <a href="{% url 'profile' %}">Профиль</a>
             {% endif %}
 
 
@@ -51,14 +51,14 @@
         <form action="{% url 'accounts:logout' %}" method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-link nav-link">
-                Logout
+                Выйти
             </button>
         </form>
     {% else %}
         <form action="{% url 'accounts:login' %}" method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-link nav-link">
-                Login
+                Логин
             </button>
         </form>
     {% endif %}

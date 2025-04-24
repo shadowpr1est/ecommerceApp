@@ -102,11 +102,15 @@
       {% if password_reset_url %}
         <div class="password-reset-link">
           <a href="{{ password_reset_url }}">
-            {% translate 'Forgotten your password or username?' %}
+            {% translate 'Забыли пароль?' %}
           </a>
         </div>
       {% endif %}
         <br>
+        <a href="{% url 'registration' %}">
+            {% translate 'Зарегестрироваться' %}
+        </a>
+
       <div class="submit-row">
         <input type="submit" value="{% translate 'Log in' %}">
       </div>
